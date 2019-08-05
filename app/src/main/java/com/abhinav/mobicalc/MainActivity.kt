@@ -5,7 +5,6 @@ import android.os.Bundle
 import kotlinx.android.synthetic.main.activity_main.*
 import net.objecthunter.exp4j.ExpressionBuilder
 import android.util.Log
-import android.view.View
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.inmobi.ads.InMobiBanner
 import com.inmobi.sdk.InMobiSdk
@@ -32,14 +31,14 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_main)
 
-        //Banner Instance
+        //Banner Instance setup
         mobiBannerAdSetup()
 
-        //Interstital Ad Instance
+        //Interstital Ad Instance setup
         interstitialAd = InMobiInterstitial(this, 1564154302187 , mInterstitialAdEventListener)
         interstitialAd.load()
 
-        //Numbers
+        //Numbers in the calculator
         tvOne.setOnClickListener { appendOnExpression("1", true) }
         tvTwo.setOnClickListener { appendOnExpression("2", true) }
         tvThree.setOnClickListener { appendOnExpression("3", true) }
@@ -52,7 +51,7 @@ class MainActivity : AppCompatActivity() {
         tvZero.setOnClickListener { appendOnExpression("0", true) }
         tvDot.setOnClickListener { appendOnExpression(".", true) }
 
-        //Operators
+        //Operators of the calculator (shouldn't clear the result section
         tvPlus.setOnClickListener { appendOnExpression("+", false) }
         tvMinus.setOnClickListener { appendOnExpression("-", false) }
         tvMul.setOnClickListener { appendOnExpression("*", false) }
@@ -60,11 +59,13 @@ class MainActivity : AppCompatActivity() {
         tvOpen.setOnClickListener { appendOnExpression("(", false) }
         tvClose.setOnClickListener { appendOnExpression(")", false) }
 
+        // Clicking "CE" will clear the complete view
         tvClear.setOnClickListener {
             tvExpression.text = ""
             tvResult.text = ""
         }
 
+        // Clicking the backspace should keep removing one character at a time if the screen is not empty
         tvBack.setOnClickListener {
             val string = tvExpression.text.toString()
             if(string.isNotEmpty()){
@@ -75,12 +76,17 @@ class MainActivity : AppCompatActivity() {
 
         tvEquals.setOnClickListener {
 
+            // If interstitial ad has loaded successfully then display
             if (mCanShowAd)
                 interstitialAd.show()
 
             try {
+                // Create and validate expression entered on the view using the objecthunter plugin
                 val expression = ExpressionBuilder(tvExpression.text.toString()).build()
                 val result = expression.evaluate()
+
+                // On successful result check if result is a whole number or has double value
+                // This is important as whole numbers are also returned in the format x.x (e.g 21.0)
                 val longResult = result.toLong()
 
                 if (result == longResult.toDouble())
@@ -88,7 +94,8 @@ class MainActivity : AppCompatActivity() {
                 else
                     tvResult.text = result.toString()
 
-            }catch (e:Exception){
+            } catch (e:Exception){
+                // if wrong expression was given then clear the view and display the error message
                 Log.d("Exception"," message : " + e.message )
                 tvResult.text = ""
                 tvResult.text = e.message
@@ -136,29 +143,12 @@ class MainActivity : AppCompatActivity() {
                 super.onAdDisplayed(inMobiBanner)
                 Log.d(logTag, "onAdDisplayed")
             }
-
-            override fun onAdDismissed(inMobiBanner: InMobiBanner?) {
-                super.onAdDismissed(inMobiBanner)
-                Log.d(logTag, "onAdDismissed")
-            }
-
-            override fun onUserLeftApplication(inMobiBanner: InMobiBanner?) {
-                super.onUserLeftApplication(inMobiBanner)
-                Log.d(logTag, "onUserLeftApplication")
-            }
-
-            override fun onRewardsUnlocked(inMobiBanner: InMobiBanner?, map: Map<Any, Any>) {
-                super.onRewardsUnlocked(inMobiBanner, map)
-                Log.d(logTag, "onRewardsUnlocked")
-            }
         })
 
         bannerAd.load()
     }
 
     private var mInterstitialAdEventListener: InterstitialAdEventListener = object : InterstitialAdEventListener() {
-        // implementation for other events
-        // onAdReceived, onAdLoaFailed, etc
 
         override fun onAdLoadFailed(inMobiInterstitial: InMobiInterstitial, inMobiAdRequestStatus: InMobiAdRequestStatus) {
             super.onAdLoadFailed(inMobiInterstitial, inMobiAdRequestStatus)
