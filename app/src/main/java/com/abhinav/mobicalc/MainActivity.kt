@@ -120,6 +120,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // Stetting up and initializing banner ad
     private fun mobiBannerAdSetup() {
         bannerAd = banner as InMobiBanner
 
@@ -148,6 +149,7 @@ class MainActivity : AppCompatActivity() {
         bannerAd.load()
     }
 
+    // Setting up and initializing interstitial ad
     private var mInterstitialAdEventListener: InterstitialAdEventListener = object : InterstitialAdEventListener() {
 
         override fun onAdLoadFailed(inMobiInterstitial: InMobiInterstitial, inMobiAdRequestStatus: InMobiAdRequestStatus) {
