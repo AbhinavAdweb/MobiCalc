@@ -5,7 +5,6 @@ import android.os.Bundle
 import kotlinx.android.synthetic.main.activity_main.*
 import net.objecthunter.exp4j.ExpressionBuilder
 import android.util.Log
-import com.facebook.drawee.backends.pipeline.Fresco
 import com.inmobi.ads.InMobiBanner
 import com.inmobi.sdk.InMobiSdk
 import com.inmobi.ads.InMobiAdRequestStatus
@@ -16,14 +15,11 @@ import com.inmobi.ads.listeners.InterstitialAdEventListener
 class MainActivity : AppCompatActivity() {
 
     private val logTag = "Test Ad Banner : "
-    private var mCanShowAd = false
     private lateinit var interstitialAd: InMobiInterstitial
     private lateinit var bannerAd: InMobiBanner
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        Fresco.initialize(this)
 
         //Initialize InMobi sdk
         InMobiSdk.init(this, "d94ee7a33e2c401d942285199383ab6f")
@@ -77,8 +73,10 @@ class MainActivity : AppCompatActivity() {
         tvEquals.setOnClickListener {
 
             // If interstitial ad has loaded successfully then display
-            if (mCanShowAd)
+            if (interstitialAd.isReady)
                 interstitialAd.show()
+            else
+                interstitialAd.load()
 
             try {
                 // Create and validate expression entered on the view using the objecthunter plugin
@@ -124,6 +122,7 @@ class MainActivity : AppCompatActivity() {
     private fun mobiBannerAdSetup() {
         bannerAd = banner as InMobiBanner
 
+        bannerAd.setAnimationType(InMobiBanner.AnimationType.ROTATE_HORIZONTAL_AXIS)
         bannerAd.setListener(object : BannerAdEventListener() {
             override fun onAdLoadSucceeded(inMobiBanner: InMobiBanner) {
                 super.onAdLoadSucceeded(inMobiBanner)
@@ -158,18 +157,15 @@ class MainActivity : AppCompatActivity() {
         }
         override fun onAdLoadSucceeded(inMobiInterstitial: InMobiInterstitial?) {
             Log.d("Test Interstitial : ", "Ad can now be shown!")
-            mCanShowAd = true
         }
 
         override fun onAdDismissed(inMobiInterstitial: InMobiInterstitial) {
             super.onAdDismissed(inMobiInterstitial)
-            interstitialAd.load()
             Log.d("Test Interstitial : ", "onAdDismissed $inMobiInterstitial")
         }
 
         override fun onAdDisplayFailed(inMobiInterstitial: InMobiInterstitial) {
             super.onAdDisplayFailed(inMobiInterstitial)
-            interstitialAd.load()
             Log.d("Test Interstitial : ", "onAdDisplayFailed")
         }
     }

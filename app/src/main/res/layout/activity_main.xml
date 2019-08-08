@@ -11,9 +11,8 @@
             android:id="@+id/banner"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:gravity="center_horizontal"
             ads:placementId="plid-1563958303771"
-            ads:refreshInterval="60"/>
+            ads:refreshInterval="10"/>
 
     <TextView
             android:id="@+id/tvExpression"
